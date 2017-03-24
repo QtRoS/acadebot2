@@ -44,12 +44,13 @@ func CourseraAdapter(query string, limit int) []shared.CourseInfo {
 
 	logu.Info.Println("Results count", len(response.Elements))
 
-	var infos = make([]shared.CourseInfo, limit)
-	for i, e := range response.Elements {
+	var infos = make([]shared.CourseInfo, 0, limit)
+	for _, e := range response.Elements {
 		link := CourseraBaseUrl + e.Slug
 		desc := e.Description[:shared.Min(240, len(e.Description))]
 		info := shared.CourseInfo{Name: e.Name, Headline: desc, Link: link, Art: e.PhotoUrl}
-		infos[i] = info
+		// infos[i] = info
+		infos = append(infos, info)
 	}
 
 	return infos

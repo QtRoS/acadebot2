@@ -13,9 +13,10 @@ import (
 )
 
 const (
-	FileName       = "api.key"
-	PerSrcLimit    = 10
-	NoCoursesFound = "Sorry, no similar course found"
+	FileName         = "api.key"
+	PerSrcLimit      = 10
+	NoCoursesFound   = "Sorry, no similar course found"
+	DummyPlaceholder = "I am going to find something for you..."
 )
 
 var token string
@@ -55,6 +56,9 @@ func main() {
 
 func handleMessage(message *tgbotapi.Message) {
 	logu.Info.Printf("[%s] %s", message.From.UserName, message.Text)
+
+	bot.Send(tgbotapi.NewMessage(message.Chat.ID, DummyPlaceholder))
+
 	query := strings.TrimSpace(message.Text)
 	courses := getCourses(query)
 	if courses == nil || len(courses) == 0 {
@@ -153,7 +157,6 @@ func courseInfoToInlineQueryResult(c shared.CourseInfo) tgbotapi.InlineQueryResu
 }
 
 func createKeyboard() tgbotapi.InlineKeyboardMarkup {
-
 	bm := tgbotapi.NewInlineKeyboardButtonData("<", "-1")
 	bp := tgbotapi.NewInlineKeyboardButtonData(">", "+1")
 	bfm := tgbotapi.NewInlineKeyboardButtonData("<<", "-5")
