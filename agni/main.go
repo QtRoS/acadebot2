@@ -133,7 +133,7 @@ func getCourses(query string) []shared.CourseInfo {
 	}
 
 	jsonStr := Search(query, PerSrcLimit)
-	logu.Trace.Println(jsonStr)
+	//logu.Trace.Println(jsonStr)
 	courses := make([]shared.CourseInfo, 0, PerSrcLimit)
 
 	if err := json.Unmarshal([]byte(jsonStr), &courses); err != nil {
@@ -146,7 +146,7 @@ func getCourses(query string) []shared.CourseInfo {
 
 func courseInfoToInlineQueryResult(c shared.CourseInfo) tgbotapi.InlineQueryResultArticle {
 	id := fmt.Sprintf("%x", md5.Sum([]byte(c.Link)))
-	article := tgbotapi.NewInlineQueryResultArticleMarkdown(id, c.Name, c.String())
+	article := tgbotapi.NewInlineQueryResultArticle(id, c.Name, c.String())
 	article.URL = c.Link
 	article.ThumbURL = c.Art
 	return article
