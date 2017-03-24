@@ -58,7 +58,7 @@ func refreshCache() {
 		return
 	}
 
-	var infos = make([]shared.CourseInfo, 0, len(response.Courses))
+	var infos = make([]shared.CourseInfo, len(response.Courses))
 	for i, e := range response.Courses {
 		info := shared.CourseInfo{Name: e.Title, Headline: e.ShortSummary, Link: e.Homepage, Art: e.Image}
 		infos[i] = info

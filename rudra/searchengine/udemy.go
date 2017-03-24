@@ -45,7 +45,7 @@ func UdemyAdapter(query string, limit int) []shared.CourseInfo {
 
 	logu.Info.Println("Results count", len(response.Results))
 
-	var infos = make([]shared.CourseInfo, 0, limit)
+	var infos = make([]shared.CourseInfo, limit)
 	for i, e := range response.Results {
 		link := UdemyBaseUrl + e.Url
 		info := shared.CourseInfo{Name: e.Title, Headline: e.Headline, Link: link, Art: e.Image}
