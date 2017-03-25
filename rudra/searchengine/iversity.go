@@ -10,42 +10,41 @@ import (
 )
 
 const (
-	UdacityApiUrl         = "https://www.udacity.com/public-api/v0/courses"
-	UdacityCollectionName = "udacity"
+	IversityApiUrl         = "https://iversity.org/api/v1/courses"
+	IversityCollectionName = "iversity"
 )
 
-type udacityResponse struct {
-	Courses []udacityResult `json:"courses"`
+type iversityResponse struct {
+	Courses []iversityResult `json:"courses"`
 }
 
-type udacityResult struct {
-	Key          string `json:"key"`
-	Homepage     string `json:"homepage"`
-	Title        string `json:"title"`
-	ShortSummary string `json:"short_summary"`
-	Image        string `json:"image"`
+type iversityResult struct {
+	Url      string `json:"url"`
+	Title    string `json:"title"`
+	Subtitle string `json:"subtitle"`
+	Image    string `json:"image"`
 }
 
 func init() {
-	refreshUdacityCache()
+	refreshIversityCache()
 	ticker := time.NewTicker(time.Hour * 12)
 	go func() {
 		for _ = range ticker.C {
-			refreshUdacityCache()
+			refreshIversityCache()
 		}
 	}()
 }
 
-func refreshUdacityCache() {
-	logu.Info.Println("Gonna refresh cache", UdacityCollectionName)
+func refreshIversityCache() {
+	logu.Info.Println("Gonna refresh cache", IversityCollectionName)
 
-	data, err0 := netu.MakeRequest(UdacityApiUrl, nil, nil)
+	data, err0 := netu.MakeRequest(IversityApiUrl, nil, nil)
 	if err0 != nil {
 		logu.Error.Println("err0", err0)
 		return
 	}
 
-	response := udacityResponse{}
+	response := iversityResponse{}
 	err1 := parseJson(data, &response)
 	if err1 != nil {
 		logu.Error.Println("err1", err1)
@@ -54,7 +53,7 @@ func refreshUdacityCache() {
 
 	var infos = make([]shared.CourseInfo, len(response.Courses))
 	for i, e := range response.Courses {
-		info := shared.CourseInfo{Name: e.Title, Headline: e.ShortSummary, Link: e.Homepage, Art: e.Image}
+		info := shared.CourseInfo{Name: e.Title, Headline: e.Subtitle, Link: e.Url, Art: e.Image}
 		infos[i] = info
 	}
 
@@ -63,7 +62,7 @@ func refreshUdacityCache() {
 	session := mongoutils.MongoSession.Copy()
 	defer session.Close()
 
-	coll := session.DB(mongoutils.SeachCasheDbName).C(UdacityCollectionName)
+	coll := session.DB(mongoutils.SeachCasheDbName).C(IversityCollectionName)
 	coll.DropCollection()
 	for _, i := range infos {
 		err2 := coll.Insert(i)
@@ -75,13 +74,13 @@ func refreshUdacityCache() {
 	logu.Info.Println("Saved to MongoDB")
 }
 
-func UdacityAdapter(query string, limit int) []shared.CourseInfo {
+func IversityAdapter(query string, limit int) []shared.CourseInfo {
 	var result = []shared.CourseInfo{}
 
 	session := mongoutils.MongoSession.Copy()
 	defer session.Close()
 
-	coll := session.DB(mongoutils.SeachCasheDbName).C(UdacityCollectionName)
+	coll := session.DB(mongoutils.SeachCasheDbName).C(IversityCollectionName)
 	iter := coll.Find(bson.M{"name": bson.RegEx{".*" + query + ".*", "i"}}).Limit(limit).Iter()
 
 	err := iter.All(&result)

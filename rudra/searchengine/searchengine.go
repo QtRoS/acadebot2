@@ -27,6 +27,8 @@ func init() {
 		CourseraAdapter,
 		UdacityAdapter,
 		UdemyAdapter,
+		OpenLearningAdapter,
+		IversityAdapter,
 	}
 }
 
