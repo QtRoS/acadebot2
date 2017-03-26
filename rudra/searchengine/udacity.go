@@ -1,10 +1,10 @@
 package searchengine
 
 import (
-	"../../shared"
-	"../../shared/logu"
-	"../../shared/netu"
-	"./mongoutils"
+	"github.com/QtRoS/acadebot2/rudra/searchengine/mongoutils"
+	"github.com/QtRoS/acadebot2/shared"
+	"github.com/QtRoS/acadebot2/shared/logu"
+	"github.com/QtRoS/acadebot2/shared/netu"
 	"gopkg.in/mgo.v2/bson"
 	"time"
 )

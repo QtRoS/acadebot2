@@ -1,9 +1,9 @@
 package searchengine
 
 import (
-	"../../shared"
-	"../../shared/logu"
-	"../../shared/netu"
+	"github.com/QtRoS/acadebot2/shared"
+	"github.com/QtRoS/acadebot2/shared/logu"
+	"github.com/QtRoS/acadebot2/shared/netu"
 	"strconv"
 )
 

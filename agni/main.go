@@ -1,11 +1,11 @@
 package main
 
 import (
-	"../shared"
-	"../shared/logu"
 	"crypto/md5"
 	"encoding/json"
 	"fmt"
+	"github.com/QtRoS/acadebot2/shared"
+	"github.com/QtRoS/acadebot2/shared/logu"
 	"gopkg.in/telegram-bot-api.v4"
 	"io/ioutil"
 	"strconv"

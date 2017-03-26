@@ -1,9 +1,9 @@
 package searchengine
 
 import (
-	"../../shared"
-	"../../shared/logu"
 	"encoding/json"
+	"github.com/QtRoS/acadebot2/shared"
+	"github.com/QtRoS/acadebot2/shared/logu"
 	"sync"
 )
 

@@ -21,7 +21,7 @@ func MakeUrl(baseUrl string, params map[string]string) (string, error) {
 	}
 	myurl.RawQuery = parameters.Encode()
 
-	return myurl.String()
+	return myurl.String(), nil
 }
 
 func MakeRequest(baseUrl string, params map[string]string, headers map[string]string) ([]byte, error) {

@@ -1,11 +1,11 @@
 package main
 
 import (
-	"../shared/logu"
-	"../shared/netu"
 	"crypto/md5"
 	"encoding/json"
 	"fmt"
+	"github.com/QtRoS/acadebot2/shared/logu"
+	"github.com/QtRoS/acadebot2/shared/netu"
 	"github.com/go-redis/redis"
 	"strconv"
 	"time"

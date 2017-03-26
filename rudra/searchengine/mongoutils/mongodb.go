@@ -1,7 +1,7 @@
 package mongoutils
 
 import (
-	"../../../shared/logu"
+	"github.com/QtRoS/acadebot2/shared/logu"
 	"gopkg.in/mgo.v2"
 )
 
