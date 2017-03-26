@@ -46,10 +46,14 @@ func main() {
 	for update := range updates {
 		if update.InlineQuery != nil {
 			handleInlineQuery(update.InlineQuery)
-		} else if update.Message != nil {
-			handleMessage(update.Message)
 		} else if update.CallbackQuery != nil {
 			handleCallbackQuery(update.CallbackQuery)
+		} else if update.Message != nil {
+			if update.Message.IsCommand() {
+				handleCommand(update.Message)
+			} else {
+				handleMessage(update.Message)
+			}
 		}
 	}
 }
@@ -76,6 +80,19 @@ func handleMessage(message *tgbotapi.Message) {
 		msg.ReplyMarkup = createKeyboard(&context)
 		bot.Send(msg)
 	}
+}
+
+func handleCommand(message *tgbotapi.Message) {
+
+	var answer string
+	switch command := message.Command(); command {
+	case "/start":
+		answer = fmt.Sprintf("Hello, %s! Type course name or keyword and I will find something for you!", message.From.UserName)
+	default:
+		answer = fmt.Sprintf("Unknown command: %s", command)
+	}
+
+	bot.Send(tgbotapi.NewMessage(message.Chat.ID, answer))
 }
 
 func handleInlineQuery(inlineQuery *tgbotapi.InlineQuery) {
@@ -105,7 +122,6 @@ func handleInlineQuery(inlineQuery *tgbotapi.InlineQuery) {
 }
 
 func handleCallbackQuery(callbackQuery *tgbotapi.CallbackQuery) {
-
 	// Dummy answer to stop spinners in UI.
 	bot.AnswerCallbackQuery(tgbotapi.CallbackConfig{CallbackQueryID: callbackQuery.ID})
 
