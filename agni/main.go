@@ -55,7 +55,7 @@ func main() {
 }
 
 func handleMessage(message *tgbotapi.Message) {
-	logu.Info.Printf("[%s] %s", message.From.UserName, message.Text)
+	logu.Info.Printf("Message [%s] %s", message.From.UserName, message.Text)
 
 	bot.Send(tgbotapi.NewMessage(message.Chat.ID, DummyPlaceholder))
 
@@ -73,13 +73,13 @@ func handleMessage(message *tgbotapi.Message) {
 
 		msg := tgbotapi.NewMessage(message.Chat.ID, courseInfo.String())
 		msg.ReplyToMessageID = message.MessageID
-		msg.ReplyMarkup = createKeyboard()
+		msg.ReplyMarkup = createKeyboard(&context)
 		bot.Send(msg)
 	}
 }
 
 func handleInlineQuery(inlineQuery *tgbotapi.InlineQuery) {
-	logu.Info.Printf("[%s] %s", inlineQuery.From.UserName, inlineQuery.Query)
+	logu.Info.Printf("Inline [%s] %s", inlineQuery.From.UserName, inlineQuery.Query)
 	courses := getCourses(inlineQuery.Query)
 	if courses == nil || len(courses) == 0 {
 		return
@@ -125,7 +125,7 @@ func handleCallbackQuery(callbackQuery *tgbotapi.CallbackQuery) {
 
 	msg := tgbotapi.NewEditMessageText(callbackQuery.Message.Chat.ID,
 		callbackQuery.Message.MessageID, courseInfo.String())
-	keyboard := createKeyboard()
+	keyboard := createKeyboard(context)
 	msg.BaseEdit.ReplyMarkup = &keyboard
 	bot.Send(msg)
 }
@@ -156,14 +156,17 @@ func courseInfoToInlineQueryResult(c shared.CourseInfo) tgbotapi.InlineQueryResu
 	return article
 }
 
-func createKeyboard() tgbotapi.InlineKeyboardMarkup {
-	bm := tgbotapi.NewInlineKeyboardButtonData("<", "-1")
-	bp := tgbotapi.NewInlineKeyboardButtonData(">", "+1")
-	bfm := tgbotapi.NewInlineKeyboardButtonData("<<", "-5")
-	bfp := tgbotapi.NewInlineKeyboardButtonData(">>", "+5")
+func createKeyboard(context *UserContext) tgbotapi.InlineKeyboardMarkup {
+	status := fmt.Sprintf("%d of %d", context.Position+1, context.Count)
+	btbl := tgbotapi.NewInlineKeyboardButtonData(status, "0")
+
+	bm := tgbotapi.NewInlineKeyboardButtonData("◀ Previous", "-1")
+	bp := tgbotapi.NewInlineKeyboardButtonData("Next   ▶", "+1")
+	bfm := tgbotapi.NewInlineKeyboardButtonData("⏪", "-5")
+	bfp := tgbotapi.NewInlineKeyboardButtonData("⏩", "+5")
 
 	return tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(bm, bp),
-		tgbotapi.NewInlineKeyboardRow(bfm, bfp))
+		tgbotapi.NewInlineKeyboardRow(bfm, btbl, bfp))
 }
 
 // def create_nav_keyboard():

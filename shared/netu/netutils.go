@@ -1,7 +1,6 @@
 package netu
 
 import (
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -10,11 +9,10 @@ import (
 
 var commonClient = &http.Client{Timeout: 10 * time.Second}
 
-func MakeUrl(baseUrl string, params map[string]string) string {
+func MakeUrl(baseUrl string, params map[string]string) (string, error) {
 	myurl, err := url.Parse(baseUrl)
 	if err != nil {
-		fmt.Println("error", err)
-		return ""
+		return "", err
 	}
 
 	parameters := url.Values{}
@@ -30,7 +28,6 @@ func MakeRequest(baseUrl string, params map[string]string, headers map[string]st
 
 	myurl, err0 := url.Parse(baseUrl)
 	if err0 != nil {
-		fmt.Println("error", err0)
 		return nil, err0
 	}
 
