@@ -15,8 +15,9 @@ import (
 const (
 	FileName         = "api.key"
 	PerSrcLimit      = 10
-	NoCoursesFound   = "Sorry, no similar course found"
+	NoCoursesFound   = "Sorry, no similar course found."
 	DummyPlaceholder = "I am going to find something for you..."
+	NoContextFound   = "Sorry, can't navigate through results. Try to search again!"
 )
 
 var token string
@@ -25,7 +26,7 @@ var bot *tgbotapi.BotAPI
 func init() {
 	content, err := ioutil.ReadFile(FileName)
 	if err != nil {
-		logu.Error.Printf("Can't read token:", err)
+		logu.Error.Prinln("Can't read token:", err)
 	}
 	token = string(content)
 	logu.Trace.Print("Token: ", token)
@@ -125,9 +126,14 @@ func handleCallbackQuery(callbackQuery *tgbotapi.CallbackQuery) {
 	// Dummy answer to stop spinners in UI.
 	bot.AnswerCallbackQuery(tgbotapi.CallbackConfig{CallbackQueryID: callbackQuery.ID})
 
-	delta, _ := strconv.Atoi(callbackQuery.Data)
-
+	// Check if there context for that user.
 	context := RestoreContext(callbackQuery.Message.Chat.ID)
+	if context == nil {
+		bot.Send(tgbotapi.NewMessage(callbackQuery.Message.Chat.ID, NoContextFound))
+		return
+	}
+
+	delta, _ := strconv.Atoi(callbackQuery.Data)
 	context.Position = shared.Max(context.Position+delta, 0)
 	context.Position = shared.Min(context.Position, context.Count-1)
 	SaveContext(callbackQuery.Message.Chat.ID, context)
@@ -145,6 +151,8 @@ func handleCallbackQuery(callbackQuery *tgbotapi.CallbackQuery) {
 	msg.BaseEdit.ReplyMarkup = &keyboard
 	bot.Send(msg)
 }
+
+// ---------------------------------------- Helpers ==========================$
 
 func getCourses(query string) []shared.CourseInfo {
 	query = strings.TrimSpace(query)
@@ -184,12 +192,3 @@ func createKeyboard(context *UserContext) tgbotapi.InlineKeyboardMarkup {
 	return tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(bm, bp),
 		tgbotapi.NewInlineKeyboardRow(bfm, btbl, bfp))
 }
-
-// def create_nav_keyboard():
-//     markup = types.InlineKeyboardMarkup(row_width=2)
-//     bm = types.InlineKeyboardButton('Back', callback_data=str(-1))
-//     bp = types.InlineKeyboardButton('Forward', callback_data=str(1))
-//     bmm = types.InlineKeyboardButton('Fast back', callback_data=str(-5))
-//     bpp = types.InlineKeyboardButton('Fast forward', callback_data=str(5))
-//     markup.add(bm, bp, bmm, bpp)
-//     return markup

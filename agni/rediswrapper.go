@@ -16,7 +16,7 @@ var client *redis.Client
 const (
 	SearchUrl         = "http://localhost:19191/courses"
 	SearchTtlMinutes  = 60
-	ContextTtlMinutes = 10
+	ContextTtlMinutes = 15
 )
 
 type UserContext struct {
@@ -57,6 +57,7 @@ func RestoreContext(chatId int64) *UserContext {
 		} else {
 			logu.Error.Println("Redis error:", err0)
 		}
+		return nil
 	}
 
 	var context UserContext

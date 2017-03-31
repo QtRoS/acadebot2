@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	// "github.com/gorilla/mux"
 	"github.com/QtRoS/acadebot2/rudra/searchengine"
 	"net/http"
 	"strconv"
