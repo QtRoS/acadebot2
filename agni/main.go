@@ -26,7 +26,7 @@ var bot *tgbotapi.BotAPI
 func init() {
 	content, err := ioutil.ReadFile(FileName)
 	if err != nil {
-		logu.Error.Prinln("Can't read token:", err)
+		logu.Error.Print("Can't read token:", err)
 	}
 	token = string(content)
 	logu.Trace.Print("Token: ", token)
