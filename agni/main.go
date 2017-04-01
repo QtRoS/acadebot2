@@ -18,6 +18,10 @@ const (
 	NoCoursesFound   = "Sorry, no similar course found."
 	DummyPlaceholder = "I am going to find something for you..."
 	NoContextFound   = "Sorry, can't navigate through results. Try to search again!"
+	Greeting         = `Hello, %s!
+	I can help you with finding online courses (MOOCs).
+	Type course name or keyword and I will find something for you! 
+	https://storebot.me/bot/acade_bot`
 )
 
 var token string
@@ -87,8 +91,8 @@ func handleCommand(message *tgbotapi.Message) {
 
 	var answer string
 	switch command := message.Command(); command {
-	case "/start":
-		answer = fmt.Sprintf("Hello, %s! Type course name or keyword and I will find something for you!", message.From.UserName)
+	case "start":
+		answer = fmt.Sprintf(Greeting, message.From.UserName)
 	default:
 		answer = fmt.Sprintf("Unknown command: %s", command)
 	}
@@ -168,6 +172,10 @@ func getCourses(query string) []shared.CourseInfo {
 		logu.Error.Println("Bad JSON:", err)
 		return nil
 	}
+
+	// for _, c := range courses {
+	// 	logu.Trace.Println(c.Link)
+	// }
 
 	return courses
 }

@@ -52,10 +52,19 @@ func refreshUdacityCache() {
 		return
 	}
 
-	var infos = make([]shared.CourseInfo, len(response.Courses))
-	for i, e := range response.Courses {
+	uniqueSet := make(map[string]bool)
+	var infos = make([]shared.CourseInfo, 0, len(response.Courses))
+	for _, e := range response.Courses {
+		// Check uniqueness.
+		if uniqueSet[e.Homepage] {
+			logu.Warning.Println("Result dublicate:", e.Homepage)
+			continue
+		} else {
+			uniqueSet[e.Homepage] = true
+		}
+
 		info := shared.CourseInfo{Name: e.Title, Headline: e.ShortSummary, Link: e.Homepage, Art: e.Image}
-		infos[i] = info
+		infos = append(infos, info)
 	}
 
 	logu.Info.Println("New cache size", len(infos))
