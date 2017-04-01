@@ -8,12 +8,14 @@ import (
 	"github.com/QtRoS/acadebot2/shared/logu"
 	"gopkg.in/telegram-bot-api.v4"
 	"io/ioutil"
+	"os"
 	"strconv"
 	"strings"
 )
 
 const (
-	FileName         = "api.key"
+	ApiFileName      = "api.key"
+	EnvApiKey        = "ENV_API_KEY"
 	PerSrcLimit      = 10
 	NoCoursesFound   = "Sorry, no similar course found."
 	DummyPlaceholder = "I am going to find something for you..."
@@ -28,11 +30,14 @@ var token string
 var bot *tgbotapi.BotAPI
 
 func init() {
-	content, err := ioutil.ReadFile(FileName)
+	content, err := ioutil.ReadFile(ApiFileName)
 	if err != nil {
-		logu.Error.Print("Can't read token:", err)
+		logu.Warning.Print("Can't read token from file:", ApiFileName, err)
+		token = os.Getenv(EnvApiKey)
+	} else {
+		token = string(content)
 	}
-	token = string(content)
+
 	logu.Trace.Print("Token: ", token)
 
 	bot, err = tgbotapi.NewBotAPI(token)
