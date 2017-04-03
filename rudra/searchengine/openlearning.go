@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	OpenLearningApiUrl         = "https://www.udacity.com/public-api/v0/courses"
+	OpenLearningApiUrl         = "https://www.openlearning.com/api/courses/list?type=free,paid"
 	OpenLearningCollectionName = "openlearning"
 )
 
