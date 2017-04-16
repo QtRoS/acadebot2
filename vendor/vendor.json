@@ -1,0 +1,85 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"checksumSHA1": "V7tBIJmTA1lS00n9JFqGAixhS6E=",
+			"path": "github.com/go-redis/redis",
+			"revision": "2cf5af9928978bbef8d1076607022403439e177c",
+			"revisionTime": "2017-03-20T10:23:42Z"
+		},
+		{
+			"checksumSHA1": "XUqPA2V7/z8JyWnCPclCztcXO7M=",
+			"path": "github.com/go-redis/redis/internal",
+			"revision": "2cf5af9928978bbef8d1076607022403439e177c",
+			"revisionTime": "2017-03-20T10:23:42Z"
+		},
+		{
+			"checksumSHA1": "GQZsUVg/+6UpQAYpc4luMvMutSI=",
+			"path": "github.com/go-redis/redis/internal/consistenthash",
+			"revision": "2cf5af9928978bbef8d1076607022403439e177c",
+			"revisionTime": "2017-03-20T10:23:42Z"
+		},
+		{
+			"checksumSHA1": "VP0K8vvf716n6xuzAZTvpz+wTwc=",
+			"path": "github.com/go-redis/redis/internal/hashtag",
+			"revision": "2cf5af9928978bbef8d1076607022403439e177c",
+			"revisionTime": "2017-03-20T10:23:42Z"
+		},
+		{
+			"checksumSHA1": "R3ZMjMsT4Be82Gstb7r8ijyQEaw=",
+			"path": "github.com/go-redis/redis/internal/pool",
+			"revision": "2cf5af9928978bbef8d1076607022403439e177c",
+			"revisionTime": "2017-03-20T10:23:42Z"
+		},
+		{
+			"checksumSHA1": "4+jL3+y/up48Cfew+2llzjGSf5A=",
+			"path": "github.com/go-redis/redis/internal/proto",
+			"revision": "2cf5af9928978bbef8d1076607022403439e177c",
+			"revisionTime": "2017-03-20T10:23:42Z"
+		},
+		{
+			"checksumSHA1": "t8jzPFIv4DNACv+cuZoigNmjPLQ=",
+			"path": "github.com/technoweenie/multipartstreamer",
+			"revision": "a90a01d73ae432e2611d178c18367fbaa13e0154",
+			"revisionTime": "2013-10-20T00:18:33Z"
+		},
+		{
+			"checksumSHA1": "1D8GzeoFGUs5FZOoyC2DpQg8c5Y=",
+			"path": "gopkg.in/mgo.v2",
+			"revision": "3f83fa5005286a7fe593b055f0d7771a7dce4655",
+			"revisionTime": "2016-08-18T02:01:20Z"
+		},
+		{
+			"checksumSHA1": "YsB2DChSV9HxdzHaKATllAUKWSI=",
+			"path": "gopkg.in/mgo.v2/bson",
+			"revision": "3f83fa5005286a7fe593b055f0d7771a7dce4655",
+			"revisionTime": "2016-08-18T02:01:20Z"
+		},
+		{
+			"checksumSHA1": "XQsrqoNT1U0KzLxOFcAZVvqhLfk=",
+			"path": "gopkg.in/mgo.v2/internal/json",
+			"revision": "3f83fa5005286a7fe593b055f0d7771a7dce4655",
+			"revisionTime": "2016-08-18T02:01:20Z"
+		},
+		{
+			"checksumSHA1": "LEvMCnprte47qdAxWvQ/zRxVF1U=",
+			"path": "gopkg.in/mgo.v2/internal/sasl",
+			"revision": "3f83fa5005286a7fe593b055f0d7771a7dce4655",
+			"revisionTime": "2016-08-18T02:01:20Z"
+		},
+		{
+			"checksumSHA1": "+1WDRPaOphSCmRMxVPIPBV4aubc=",
+			"path": "gopkg.in/mgo.v2/internal/scram",
+			"revision": "3f83fa5005286a7fe593b055f0d7771a7dce4655",
+			"revisionTime": "2016-08-18T02:01:20Z"
+		},
+		{
+			"checksumSHA1": "AzeP9gpBdHRcPQ5ozBpkBcqfInk=",
+			"path": "gopkg.in/telegram-bot-api.v4",
+			"revision": "0a57807db79efce7f6719fbb2c0e0f83fda79aec",
+			"revisionTime": "2016-11-25T05:50:35Z"
+		}
+	],
+	"rootPath": "github.com/QtRoS/acadebot2"
+}
