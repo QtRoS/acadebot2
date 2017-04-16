@@ -29,7 +29,7 @@ func init() {
 	refreshIversityCache()
 	ticker := time.NewTicker(time.Hour * 12)
 	go func() {
-		for _ = range ticker.C {
+		for range ticker.C {
 			refreshIversityCache()
 		}
 	}()
@@ -62,7 +62,7 @@ func refreshIversityCache() {
 	session := mongoutils.MongoSession.Copy()
 	defer session.Close()
 
-	coll := session.DB(mongoutils.SeachCasheDbName).C(IversityCollectionName)
+	coll := session.DB(mongoutils.SearchCacheDbName).C(IversityCollectionName)
 	coll.DropCollection()
 	for _, i := range infos {
 		err2 := coll.Insert(i)
@@ -80,7 +80,7 @@ func IversityAdapter(query string, limit int) []shared.CourseInfo {
 	session := mongoutils.MongoSession.Copy()
 	defer session.Close()
 
-	coll := session.DB(mongoutils.SeachCasheDbName).C(IversityCollectionName)
+	coll := session.DB(mongoutils.SearchCacheDbName).C(IversityCollectionName)
 	iter := coll.Find(bson.M{"name": bson.RegEx{".*" + query + ".*", "i"}}).Limit(limit).Iter()
 
 	err := iter.All(&result)

@@ -29,7 +29,7 @@ func init() {
 	refreshOpenlearningCache()
 	ticker := time.NewTicker(time.Hour * 12)
 	go func() {
-		for _ = range ticker.C {
+		for range ticker.C {
 			refreshOpenlearningCache()
 		}
 	}()
@@ -63,7 +63,7 @@ func refreshOpenlearningCache() {
 	session := mongoutils.MongoSession.Copy()
 	defer session.Close()
 
-	coll := session.DB(mongoutils.SeachCasheDbName).C(OpenLearningCollectionName)
+	coll := session.DB(mongoutils.SearchCacheDbName).C(OpenLearningCollectionName)
 	coll.DropCollection()
 	for _, i := range infos {
 		err2 := coll.Insert(i)
@@ -81,7 +81,7 @@ func OpenLearningAdapter(query string, limit int) []shared.CourseInfo {
 	session := mongoutils.MongoSession.Copy()
 	defer session.Close()
 
-	coll := session.DB(mongoutils.SeachCasheDbName).C(OpenLearningCollectionName)
+	coll := session.DB(mongoutils.SearchCacheDbName).C(OpenLearningCollectionName)
 	iter := coll.Find(bson.M{"name": bson.RegEx{".*" + query + ".*", "i"}}).Limit(limit).Iter()
 
 	err := iter.All(&result)

@@ -30,7 +30,7 @@ func init() {
 	refreshUdacityCache()
 	ticker := time.NewTicker(time.Hour * 12)
 	go func() {
-		for _ = range ticker.C {
+		for range ticker.C {
 			refreshUdacityCache()
 		}
 	}()
@@ -72,7 +72,7 @@ func refreshUdacityCache() {
 	session := mongoutils.MongoSession.Copy()
 	defer session.Close()
 
-	coll := session.DB(mongoutils.SeachCasheDbName).C(UdacityCollectionName)
+	coll := session.DB(mongoutils.SearchCacheDbName).C(UdacityCollectionName)
 	coll.DropCollection()
 	for _, i := range infos {
 		err2 := coll.Insert(i)
@@ -90,7 +90,7 @@ func UdacityAdapter(query string, limit int) []shared.CourseInfo {
 	session := mongoutils.MongoSession.Copy()
 	defer session.Close()
 
-	coll := session.DB(mongoutils.SeachCasheDbName).C(UdacityCollectionName)
+	coll := session.DB(mongoutils.SearchCacheDbName).C(UdacityCollectionName)
 	iter := coll.Find(bson.M{"name": bson.RegEx{".*" + query + ".*", "i"}}).Limit(limit).Iter()
 
 	err := iter.All(&result)

@@ -40,13 +40,13 @@ func Search(query string, perSourceLimit int) string {
 	logu.Info.Println("Gonna search for:", query)
 
 	mergedResults := callAdapters(query, perSourceLimit)
-	json, error := toJson(mergedResults)
-	if error != nil {
-		logu.Error.Println(error)
+	jsonData, err := toJson(mergedResults)
+	if err != nil {
+		logu.Error.Println(err)
 		return EmptyResult
 	}
 	// logu.Trace.Println(string(json))
-	return string(json)
+	return string(jsonData)
 }
 
 func callAdapters(query string, perSourceLimit int) []shared.CourseInfo {
