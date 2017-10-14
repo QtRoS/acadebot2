@@ -2,55 +2,48 @@ package searchengine
 
 import (
 	"encoding/json"
+	"sync"
+	"time"
+
 	"github.com/QtRoS/acadebot2/shared"
 	"github.com/QtRoS/acadebot2/shared/logu"
-	"sync"
 )
 
 const (
-	EmptyResult = "[]"
+	emptyResult = "[]"
 )
 
-// type CourseInfo struct {
-// 	Name     string `json:"name"`
-// 	Headline string `json:"headline"`
-// 	Link     string `json:"link"`
-// 	Art      string `json:"art"`
-// }
+type SourceAdapter interface {
+	Get(query string, limit int) []shared.CourseInfo
+	Name() string
+}
 
-type InfoSourceAdapter func(query string, limit int) []shared.CourseInfo
-
-var adapters []InfoSourceAdapter
-
-func init() {
-	adapters = []InfoSourceAdapter{
-		CourseraAdapter,
-		UdacityAdapter,
-		UdemyAdapter,
-		OpenLearningAdapter,
-		IversityAdapter,
-	}
+var adapters = []SourceAdapter{
+	&courseraAdapter{},
+	NewFilteringAdapter(NewCachingAdapter(&udacityAdapter{}, time.Hour*6)),
+	&udemyAdapter{},
+	NewFilteringAdapter(NewCachingAdapter(&openlearningAdapter{}, time.Hour*6)),
+	NewFilteringAdapter(NewCachingAdapter(&iversityAdapter{}, time.Hour*6)),
 }
 
 func Search(query string, perSourceLimit int) string {
 	if query == "" || perSourceLimit <= 0 {
-		return EmptyResult
+		return emptyResult
 	}
 
-	logu.Info.Println("Gonna search for:", query)
+	logu.Info.Println("Gonna search for:", query, " <------------------- ")
 
 	mergedResults := callAdapters(query, perSourceLimit)
-	jsonData, err := toJson(mergedResults)
+	jsonData, err := toJSON(mergedResults)
 	if err != nil {
 		logu.Error.Println(err)
-		return EmptyResult
+		return emptyResult
 	}
 	// logu.Trace.Println(string(json))
 	return string(jsonData)
 }
 
 func callAdapters(query string, perSourceLimit int) []shared.CourseInfo {
-	// var results []CourseInfo
 	results := make([]shared.CourseInfo, 0, perSourceLimit)
 
 	adaptersChunks := make(chan []shared.CourseInfo)
@@ -58,9 +51,9 @@ func callAdapters(query string, perSourceLimit int) []shared.CourseInfo {
 	wg.Add(len(adapters) + 1)
 
 	for _, adapter := range adapters {
-		go func(adapt InfoSourceAdapter) {
+		go func(adapt SourceAdapter) {
 			defer wg.Done()
-			adaptersChunks <- adapt(query, perSourceLimit)
+			adaptersChunks <- adapt.Get(query, perSourceLimit)
 		}(adapter)
 	}
 
@@ -86,10 +79,10 @@ func callAdapters(query string, perSourceLimit int) []shared.CourseInfo {
 // 	return results
 // }
 
-func toJson(infos []shared.CourseInfo) ([]byte, error) {
+func toJSON(infos []shared.CourseInfo) ([]byte, error) {
 	return json.Marshal(infos)
 }
 
-func parseJson(data []byte, target interface{}) error {
+func parseJSON(data []byte, target interface{}) error {
 	return json.Unmarshal(data, target)
 }

@@ -1,12 +1,9 @@
 package searchengine
 
 import (
-	"github.com/QtRoS/acadebot2/rudra/searchengine/mongoutils"
 	"github.com/QtRoS/acadebot2/shared"
 	"github.com/QtRoS/acadebot2/shared/logu"
 	"github.com/QtRoS/acadebot2/shared/netu"
-	"gopkg.in/mgo.v2/bson"
-	"time"
 )
 
 const (
@@ -26,30 +23,29 @@ type udacityResult struct {
 	Image        string `json:"image"`
 }
 
-func init() {
-	refreshUdacityCache()
-	ticker := time.NewTicker(time.Hour * 12)
-	go func() {
-		for range ticker.C {
-			refreshUdacityCache()
-		}
-	}()
+type udacityAdapter struct {
 }
 
-func refreshUdacityCache() {
-	logu.Info.Println("Gonna refresh cache", UdacityCollectionName)
+func (me *udacityAdapter) Name() string {
+	return "Udacity"
+}
 
+func (me *udacityAdapter) Get(query string, limit int) []shared.CourseInfo {
+	return UdacityAdapter(query, limit)
+}
+
+func UdacityAdapter(query string, limit int) []shared.CourseInfo {
 	data, err0 := netu.MakeRequest(UdacityApiUrl, nil, nil)
 	if err0 != nil {
 		logu.Error.Println("err0", err0)
-		return
+		return nil
 	}
 
 	response := udacityResponse{}
-	err1 := parseJson(data, &response)
+	err1 := parseJSON(data, &response)
 	if err1 != nil {
 		logu.Error.Println("err1", err1)
-		return
+		return nil
 	}
 
 	uniqueSet := make(map[string]bool)
@@ -67,39 +63,7 @@ func refreshUdacityCache() {
 		infos = append(infos, info)
 	}
 
-	logu.Info.Println("New cache size", len(infos))
+	logu.Info.Println("Results count", len(infos))
 
-	session := mongoutils.MongoSession.Copy()
-	defer session.Close()
-
-	coll := session.DB(mongoutils.SearchCacheDbName).C(UdacityCollectionName)
-	coll.DropCollection()
-	for _, i := range infos {
-		err2 := coll.Insert(i)
-		if err2 != nil {
-			logu.Error.Println("err2", err2)
-		}
-	}
-
-	logu.Info.Println("Saved to MongoDB")
-}
-
-func UdacityAdapter(query string, limit int) []shared.CourseInfo {
-	var result = []shared.CourseInfo{}
-
-	session := mongoutils.MongoSession.Copy()
-	defer session.Close()
-
-	coll := session.DB(mongoutils.SearchCacheDbName).C(UdacityCollectionName)
-	iter := coll.Find(bson.M{"name": bson.RegEx{".*" + query + ".*", "i"}}).Limit(limit).Iter()
-
-	err := iter.All(&result)
-	if err != nil {
-		logu.Error.Println(err)
-		return nil
-	}
-
-	logu.Info.Println("Results count", len(result))
-
-	return result
+	return infos
 }

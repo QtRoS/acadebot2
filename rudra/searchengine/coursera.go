@@ -1,10 +1,11 @@
 package searchengine
 
 import (
+	"strconv"
+
 	"github.com/QtRoS/acadebot2/shared"
 	"github.com/QtRoS/acadebot2/shared/logu"
 	"github.com/QtRoS/acadebot2/shared/netu"
-	"strconv"
 )
 
 const (
@@ -25,6 +26,17 @@ type courseraElement struct {
 	Link        string `json:"link"`
 }
 
+type courseraAdapter struct {
+}
+
+func (me *courseraAdapter) Name() string {
+	return "Coursera"
+}
+
+func (me *courseraAdapter) Get(query string, limit int) []shared.CourseInfo {
+	return CourseraAdapter(query, limit)
+}
+
 func CourseraAdapter(query string, limit int) []shared.CourseInfo {
 
 	data, err0 := netu.MakeRequest(CourseraApiUrl,
@@ -36,7 +48,7 @@ func CourseraAdapter(query string, limit int) []shared.CourseInfo {
 	}
 
 	response := courseraResponse{}
-	err1 := parseJson(data, &response)
+	err1 := parseJSON(data, &response)
 	if err1 != nil {
 		logu.Error.Println(err1)
 		return nil
@@ -49,7 +61,6 @@ func CourseraAdapter(query string, limit int) []shared.CourseInfo {
 		link := CourseraBaseUrl + e.Slug
 		desc := e.Description[:shared.Min(240, len(e.Description))]
 		info := shared.CourseInfo{Name: e.Name, Headline: desc, Link: link, Art: e.PhotoUrl}
-		// infos[i] = info
 		infos = append(infos, info)
 	}
 

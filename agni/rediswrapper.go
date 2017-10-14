@@ -1,20 +1,20 @@
 package main
 
 import (
-	"crypto/md5"
 	"encoding/json"
 	"fmt"
-	"github.com/QtRoS/acadebot2/shared/logu"
-	"github.com/QtRoS/acadebot2/shared/netu"
-	"github.com/go-redis/redis"
-	"strconv"
+	"os"
 	"time"
+
+	"github.com/QtRoS/acadebot2/shared/logu"
+	"github.com/go-redis/redis"
 )
 
 var client *redis.Client
 
 const (
-	SearchUrl         = "http://localhost:19191/courses"
+	EnvRedisAddress   = "ENV_REDIS_ADDRESS"
+	EnvRedisPass      = "ENV_REDIS_PASS"
 	SearchTtlMinutes  = 60
 	ContextTtlMinutes = 15
 )
@@ -27,9 +27,9 @@ type UserContext struct {
 
 func init() {
 	client = redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
-		Password: "", // no password set
-		DB:       0,  // use default DB
+		Addr:     os.Getenv(EnvRedisAddress) + ":6379",
+		Password: os.Getenv(EnvRedisPass), // no password set
+		DB:       0,                       // use default DB
 	})
 
 	pong, err := client.Ping().Result()
@@ -66,34 +66,4 @@ func RestoreContext(chatId int64) *UserContext {
 		logu.Error.Println(err1)
 	}
 	return &context
-}
-
-func Search(query string, limit int) string {
-	redisKey := fmt.Sprintf("query:%x", md5.Sum([]byte(query)))
-
-	value, err := client.Get(redisKey).Result()
-	if err != nil {
-		if err == redis.Nil {
-			logu.Info.Println("Redis miss: ", query)
-			newValue := searchInBackService(query, limit)
-			client.Set(redisKey, newValue, time.Minute*SearchTtlMinutes)
-			value = string(newValue)
-		} else {
-			logu.Error.Println("Redis error:", err)
-		}
-	}
-
-	return value
-}
-
-func searchInBackService(query string, limit int) []byte {
-	data, err := netu.MakeRequest(SearchUrl,
-		map[string]string{"query": query, "limit": strconv.Itoa(limit)}, nil)
-
-	if err != nil {
-		logu.Error.Println(err)
-		return nil
-	}
-
-	return data
 }

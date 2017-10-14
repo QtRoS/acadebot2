@@ -1,10 +1,11 @@
 package searchengine
 
 import (
+	"strconv"
+
 	"github.com/QtRoS/acadebot2/shared"
 	"github.com/QtRoS/acadebot2/shared/logu"
 	"github.com/QtRoS/acadebot2/shared/netu"
-	"strconv"
 )
 
 const (
@@ -25,6 +26,17 @@ type udemyResult struct {
 	Image    string `json:"image_480x270"`
 }
 
+type udemyAdapter struct {
+}
+
+func (me *udemyAdapter) Name() string {
+	return "Udemy"
+}
+
+func (me *udemyAdapter) Get(query string, limit int) []shared.CourseInfo {
+	return UdemyAdapter(query, limit)
+}
+
 func UdemyAdapter(query string, limit int) []shared.CourseInfo {
 
 	data, err0 := netu.MakeRequest(UdemyApiUrl,
@@ -37,7 +49,7 @@ func UdemyAdapter(query string, limit int) []shared.CourseInfo {
 	}
 
 	response := udemyResponse{}
-	err1 := parseJson(data, &response)
+	err1 := parseJSON(data, &response)
 	if err1 != nil {
 		logu.Error.Println("err1", err1)
 		return nil
@@ -49,7 +61,6 @@ func UdemyAdapter(query string, limit int) []shared.CourseInfo {
 	for _, e := range response.Results {
 		link := UdemyBaseUrl + e.Url
 		info := shared.CourseInfo{Name: e.Title, Headline: e.Headline, Link: link, Art: e.Image}
-		// infos[i] = info
 		infos = append(infos, info)
 	}
 

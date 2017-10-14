@@ -4,21 +4,20 @@ import (
 	"crypto/md5"
 	"encoding/json"
 	"fmt"
-	"github.com/QtRoS/acadebot2/shared"
-	"github.com/QtRoS/acadebot2/shared/logu"
-	"gopkg.in/telegram-bot-api.v4"
-	"io/ioutil"
 	"os"
 	"strconv"
 	"strings"
+
+	"github.com/QtRoS/acadebot2/shared"
+	"github.com/QtRoS/acadebot2/shared/logu"
+	"gopkg.in/telegram-bot-api.v4"
 )
 
 const (
-	ApiFileName      = "api.key"
 	EnvApiKey        = "ENV_API_KEY"
 	PerSrcLimit      = 10
 	NoCoursesFound   = "Sorry, no similar course found."
-	DummyPlaceholder = "I am going to find something for you..."
+	DummyPlaceholder = "Just a moment..."
 	NoContextFound   = "Sorry, can't navigate through results. Try to search again!"
 	Greeting         = `Hello, %s!
 	I can help you with finding online courses (MOOCs).
@@ -26,20 +25,14 @@ const (
 	https://storebot.me/bot/acade_bot`
 )
 
-var token string
 var bot *tgbotapi.BotAPI
 
 func init() {
-	content, err := ioutil.ReadFile(ApiFileName)
-	if err != nil {
-		logu.Warning.Print("Can't read token from file:", ApiFileName, err)
-		token = os.Getenv(EnvApiKey)
-	} else {
-		token = string(content)
-	}
+	token := os.Getenv(EnvApiKey)
 
 	logu.Trace.Print("Token: ", token)
 
+	var err error
 	bot, err = tgbotapi.NewBotAPI(token)
 	if err != nil {
 		logu.Error.Panic(err)
