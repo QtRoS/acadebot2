@@ -22,7 +22,7 @@ func (me *filteringAdapter) Name() string {
 func (me *filteringAdapter) Get(query string, limit int) []shared.CourseInfo {
 	courses := me.sourceAdapter.Get(query, limit)
 
-	logu.Error.Println(me.Name(), "before filter", len(courses))
+	logu.Info.Println(me.Name(), "before filter", len(courses))
 
 	infos := make([]shared.CourseInfo, 0, limit)
 	for i := 0; i < len(courses) && len(infos) < limit; i++ {
@@ -32,7 +32,7 @@ func (me *filteringAdapter) Get(query string, limit int) []shared.CourseInfo {
 		}
 	}
 
-	logu.Error.Println(me.Name(), "after filter", len(infos))
+	logu.Info.Println(me.Name(), "after filter", len(infos))
 
 	return infos
 }

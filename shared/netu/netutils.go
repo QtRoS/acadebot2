@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-var commonClient = &http.Client{Timeout: 10 * time.Second}
+var commonClient = &http.Client{Timeout: 15 * time.Second}
 
 func MakeUrl(baseUrl string, params map[string]string) (string, error) {
 	myurl, err := url.Parse(baseUrl)

@@ -23,12 +23,14 @@ func Search(query string, limit int) string {
 	if err != nil {
 		if err == redis.Nil {
 			logu.Info.Println("Redis miss: ", query)
-			newValue := searchInBackService(query, limit)
-			client.Set(redisKey, newValue, time.Minute*SearchTtlMinutes)
-			value = string(newValue)
 		} else {
 			logu.Error.Println("Redis error:", err)
 		}
+		newValue := searchInBackService(query, limit)
+		if newValue != nil {
+			client.Set(redisKey, newValue, time.Minute*SearchTtlMinutes)
+		}
+		value = string(newValue)
 	}
 
 	return value
