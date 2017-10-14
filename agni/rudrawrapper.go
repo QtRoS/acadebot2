@@ -16,6 +16,10 @@ const EnvRudraAddress = "ENV_RUDRA_ADDRESS"
 
 var searchURL = "http://" + os.Getenv(EnvRudraAddress) + ":19191/courses"
 
+func init() {
+	netu.CommonClient.Timeout = 12 * time.Second
+}
+
 func Search(query string, limit int) string {
 	redisKey := fmt.Sprintf("query:%x", md5.Sum([]byte(query)))
 

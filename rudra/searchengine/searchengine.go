@@ -50,6 +50,8 @@ func callAdapters(query string, perSourceLimit int) []shared.CourseInfo {
 	var wg sync.WaitGroup
 	wg.Add(len(adapters) + 1)
 
+	logu.Info.Println("Before calling adapters...")
+
 	for _, adapter := range adapters {
 		go func(adapt SourceAdapter) {
 			defer wg.Done()
@@ -66,6 +68,8 @@ func callAdapters(query string, perSourceLimit int) []shared.CourseInfo {
 	}()
 
 	wg.Wait()
+	logu.Info.Println("Merged result len:", len(results))
+
 	return results
 }
 
