@@ -22,7 +22,9 @@ const (
 	greeting         = `Hello, %s!
 	I can help you with finding online courses (MOOCs).
 	Type course name or keyword and I will find something for you! 
-	https://storebot.me/bot/acade_bot`
+	(Works on Raspberry Pi 3)
+	https://storebot.me/bot/acade_bot
+	https://github.com/QtRoS/acadebot2`
 )
 
 var bot *tgbotapi.BotAPI
