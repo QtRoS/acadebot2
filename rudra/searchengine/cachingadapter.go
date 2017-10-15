@@ -65,7 +65,7 @@ func (me *cachingAdapter) Get(query string, limit int) []shared.CourseInfo {
 		return rawData
 	}
 
-	logu.Error.Println("Redis HIT:", redisKey)
+	logu.Info.Println("Redis HIT:", redisKey)
 	var result []shared.CourseInfo
 	err1 := json.Unmarshal([]byte(value), &result)
 	if err1 != nil {
