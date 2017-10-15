@@ -20,9 +20,9 @@ const (
 	dummyPlaceholder = "Just a moment..."
 	noContextFound   = "Sorry, can't navigate through results. Try to search again!"
 	greeting         = `Hello, %s!
-	I can help you with finding online courses (MOOCs).
-	Type course name or keyword and I will find something for you! 
-	(Works on Raspberry Pi 3)
+I can help you with finding online courses (MOOCs).
+Type course name or keyword and I will find something for you! 
+(Works on Raspberry Pi 3)
 	https://storebot.me/bot/acade_bot
 	https://github.com/QtRoS/acadebot2`
 )
