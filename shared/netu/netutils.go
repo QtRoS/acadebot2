@@ -7,10 +7,12 @@ import (
 	"time"
 )
 
+// CommonClient Common client.
 var CommonClient = &http.Client{Timeout: 10 * time.Second}
 
-func MakeUrl(baseUrl string, params map[string]string) (string, error) {
-	myurl, err := url.Parse(baseUrl)
+// MakeUrl Make URL from base url and params.
+func MakeUrl(baseURL string, params map[string]string) (string, error) {
+	myurl, err := url.Parse(baseURL)
 	if err != nil {
 		return "", err
 	}
@@ -23,9 +25,10 @@ func MakeUrl(baseUrl string, params map[string]string) (string, error) {
 	return myurl.String(), nil
 }
 
-func MakeRequest(baseUrl string, params map[string]string, headers map[string]string) ([]byte, error) {
+// MakeRequest Make request from base url, params and headers.
+func MakeRequest(baseURL string, params map[string]string, headers map[string]string) ([]byte, error) {
 
-	myurl, err0 := url.Parse(baseUrl)
+	myurl, err0 := url.Parse(baseURL)
 	if err0 != nil {
 		return nil, err0
 	}
@@ -36,9 +39,9 @@ func MakeRequest(baseUrl string, params map[string]string, headers map[string]st
 	}
 	myurl.RawQuery = parameters.Encode()
 
-	baseUrl = myurl.String()
+	baseURL = myurl.String()
 
-	req, err1 := http.NewRequest("GET", baseUrl, nil)
+	req, err1 := http.NewRequest("GET", baseURL, nil)
 	if err1 != nil {
 		return nil, err1
 	}

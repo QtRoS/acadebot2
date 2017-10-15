@@ -31,10 +31,6 @@ func (me *udacityAdapter) Name() string {
 }
 
 func (me *udacityAdapter) Get(query string, limit int) []shared.CourseInfo {
-	return UdacityAdapter(query, limit)
-}
-
-func UdacityAdapter(query string, limit int) []shared.CourseInfo {
 	data, err0 := netu.MakeRequest(UdacityApiUrl, nil, nil)
 	if err0 != nil {
 		logu.Error.Println("err0", err0)

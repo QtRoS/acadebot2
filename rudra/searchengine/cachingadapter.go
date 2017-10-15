@@ -12,9 +12,8 @@ import (
 )
 
 const (
-	EmptyResult     = "[]"
-	EnvRedisAddress = "ENV_REDIS_ADDRESS"
-	EnvRedisPass    = "ENV_REDIS_PASS"
+	envRedisAddress = "ENV_REDIS_ADDRESS"
+	envRedisPass    = "ENV_REDIS_PASS"
 )
 
 type cachingAdapter struct {
@@ -23,14 +22,14 @@ type cachingAdapter struct {
 	ttl           time.Duration
 }
 
-func NewCachingAdapter(adapter SourceAdapter, ttl time.Duration) *cachingAdapter {
+func newCachingAdapter(adapter SourceAdapter, ttl time.Duration) *cachingAdapter {
 	ca := cachingAdapter{}
 	ca.sourceAdapter = adapter
 	ca.ttl = ttl
 
 	ca.client = redis.NewClient(&redis.Options{
-		Addr:     os.Getenv(EnvRedisAddress) + ":6379",
-		Password: os.Getenv(EnvRedisPass), // no password set
+		Addr:     os.Getenv(envRedisAddress) + ":6379",
+		Password: os.Getenv(envRedisPass), // no password set
 		DB:       0,                       // use default DB
 	})
 
@@ -45,29 +44,28 @@ func (me *cachingAdapter) Name() string {
 }
 
 func (me *cachingAdapter) Get(query string, limit int) []shared.CourseInfo {
-	//redisKey := fmt.Sprintf("cachingadapter:%s:%x", me.sourceAdapter.Name(), md5.Sum([]byte(query)))
 	redisKey := fmt.Sprintf("cachingadapter:%s", me.sourceAdapter.Name())
 
 	value, err := me.client.Get(redisKey).Result()
 	if err != nil {
 		if err == redis.Nil {
-			logu.Info.Println("cachingAdapter redis miss:", redisKey)
-			newValue := me.sourceAdapter.Get(query, limit)
-			valueAsJSON, err := json.Marshal(newValue)
-			if err != nil {
-				logu.Error.Println(err)
-			} else if newValue != nil {
-				me.client.Set(redisKey, valueAsJSON, me.ttl)
-			}
-
-			return newValue
+			logu.Info.Println("Redis miss:", redisKey)
+		} else {
+			logu.Error.Println("Redis error:", err)
 		}
 
-		logu.Error.Println("cachingAdapter redis error:", err)
-		return nil
+		rawData := me.sourceAdapter.Get(query, limit)
+		rawDataAsJSON, err := json.Marshal(rawData)
+		if err != nil {
+			logu.Error.Println(err)
+		} else if rawData != nil {
+			me.client.Set(redisKey, rawDataAsJSON, me.ttl)
+		}
+
+		return rawData
 	}
 
-	logu.Error.Println("cachingAdapter hit:", redisKey)
+	logu.Error.Println("Redis HIT:", redisKey)
 	var result []shared.CourseInfo
 	err1 := json.Unmarshal([]byte(value), &result)
 	if err1 != nil {

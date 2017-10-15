@@ -12,15 +12,16 @@ import (
 	"github.com/go-redis/redis"
 )
 
-const EnvRudraAddress = "ENV_RUDRA_ADDRESS"
+const envRudraAddress = "ENV_RUDRA_ADDRESS"
 
-var searchURL = "http://" + os.Getenv(EnvRudraAddress) + ":19191/courses"
+var searchURL = "http://" + os.Getenv(envRudraAddress) + ":19191/courses"
 
 func init() {
 	netu.CommonClient.Timeout = netu.CommonClient.Timeout + 2*time.Second
 }
 
-func Search(query string, limit int) string {
+// RudraSearch for courses in Rudra.
+func RudraSearch(query string, limit int) string {
 	redisKey := fmt.Sprintf("query:%x", md5.Sum([]byte(query)))
 
 	value, err := client.Get(redisKey).Result()
@@ -30,9 +31,9 @@ func Search(query string, limit int) string {
 		} else {
 			logu.Error.Println("Redis error:", err)
 		}
-		newValue := searchInBackService(query, limit)
+		newValue := rudraSearchInternal(query, limit)
 		if newValue != nil {
-			client.Set(redisKey, newValue, time.Minute*SearchTtlMinutes)
+			client.Set(redisKey, newValue, time.Minute*searchTTLMinutes)
 		}
 		value = string(newValue)
 	}
@@ -40,7 +41,7 @@ func Search(query string, limit int) string {
 	return value
 }
 
-func searchInBackService(query string, limit int) []byte {
+func rudraSearchInternal(query string, limit int) []byte {
 	data, err := netu.MakeRequest(searchURL,
 		map[string]string{"query": query, "limit": strconv.Itoa(limit)}, nil)
 

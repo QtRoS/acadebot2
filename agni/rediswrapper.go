@@ -13,13 +13,13 @@ import (
 var client *redis.Client
 
 const (
-	EnvRedisAddress   = "ENV_REDIS_ADDRESS"
-	EnvRedisPass      = "ENV_REDIS_PASS"
-	SearchTtlMinutes  = 60
-	ContextTtlMinutes = 15
+	envRedisAddress   = "ENV_REDIS_ADDRESS"
+	envRedisPass      = "ENV_REDIS_PASS"
+	searchTTLMinutes  = 60
+	contextTTLMinutes = 15
 )
 
-type UserContext struct {
+type userContext struct {
 	Query    string `json:"query"`
 	Count    int    `json:"count"`
 	Position int    `json:"position"`
@@ -27,8 +27,8 @@ type UserContext struct {
 
 func init() {
 	client = redis.NewClient(&redis.Options{
-		Addr:     os.Getenv(EnvRedisAddress) + ":6379",
-		Password: os.Getenv(EnvRedisPass), // no password set
+		Addr:     os.Getenv(envRedisAddress) + ":6379",
+		Password: os.Getenv(envRedisPass), // no password set
 		DB:       0,                       // use default DB
 	})
 
@@ -36,19 +36,21 @@ func init() {
 	logu.Info.Println("Redis ping: ", pong, err)
 }
 
-func SaveContext(chatId int64, context *UserContext) {
-	redisKey := fmt.Sprintf("usercontext:%d", chatId)
+// saveContext to Redis.
+func saveContext(chatID int64, context *userContext) {
+	redisKey := fmt.Sprintf("usercontext:%d", chatID)
 	value, err := json.Marshal(context)
 	if err != nil {
 		logu.Error.Println(err)
 		return
 	}
 
-	client.Set(redisKey, value, time.Minute*ContextTtlMinutes)
+	client.Set(redisKey, value, time.Minute*contextTTLMinutes)
 }
 
-func RestoreContext(chatId int64) *UserContext {
-	redisKey := fmt.Sprintf("usercontext:%d", chatId)
+// restoreContext from Redis.
+func restoreContext(chatID int64) *userContext {
+	redisKey := fmt.Sprintf("usercontext:%d", chatID)
 
 	value, err0 := client.Get(redisKey).Result()
 	if err0 != nil {
@@ -60,7 +62,7 @@ func RestoreContext(chatId int64) *UserContext {
 		return nil
 	}
 
-	var context UserContext
+	var context userContext
 	err1 := json.Unmarshal([]byte(value), &context)
 	if err1 != nil {
 		logu.Error.Println(err1)

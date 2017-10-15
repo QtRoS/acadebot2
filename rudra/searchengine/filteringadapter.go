@@ -11,7 +11,7 @@ type filteringAdapter struct {
 	sourceAdapter SourceAdapter
 }
 
-func NewFilteringAdapter(adapter SourceAdapter) *filteringAdapter {
+func newFilteringAdapter(adapter SourceAdapter) *filteringAdapter {
 	return &filteringAdapter{adapter}
 }
 

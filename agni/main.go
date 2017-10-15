@@ -14,12 +14,12 @@ import (
 )
 
 const (
-	EnvApiKey        = "ENV_API_KEY"
-	PerSrcLimit      = 12
-	NoCoursesFound   = "Sorry, no similar course found."
-	DummyPlaceholder = "Just a moment..."
-	NoContextFound   = "Sorry, can't navigate through results. Try to search again!"
-	Greeting         = `Hello, %s!
+	envAPIKey        = "ENV_API_KEY"
+	perSrcLimit      = 12
+	noCoursesFound   = "Sorry, no similar course found."
+	dummyPlaceholder = "Just a moment..."
+	noContextFound   = "Sorry, can't navigate through results. Try to search again!"
+	greeting         = `Hello, %s!
 	I can help you with finding online courses (MOOCs).
 	Type course name or keyword and I will find something for you! 
 	https://storebot.me/bot/acade_bot`
@@ -28,7 +28,7 @@ const (
 var bot *tgbotapi.BotAPI
 
 func init() {
-	token := os.Getenv(EnvApiKey)
+	token := os.Getenv(envAPIKey)
 
 	logu.Trace.Print("Token: ", token)
 
@@ -64,17 +64,17 @@ func main() {
 func handleMessage(message *tgbotapi.Message) {
 	logu.Info.Printf("Message [%s] %s", message.From.UserName, message.Text)
 
-	bot.Send(tgbotapi.NewMessage(message.Chat.ID, DummyPlaceholder))
+	bot.Send(tgbotapi.NewMessage(message.Chat.ID, dummyPlaceholder))
 
 	query := strings.TrimSpace(message.Text)
 	courses := getCourses(query)
 	if courses == nil || len(courses) == 0 {
-		msg := tgbotapi.NewMessage(message.Chat.ID, NoCoursesFound)
+		msg := tgbotapi.NewMessage(message.Chat.ID, noCoursesFound)
 		msg.ReplyToMessageID = message.MessageID
 		bot.Send(msg)
 	} else {
-		context := UserContext{Query: query, Position: 0, Count: len(courses)}
-		SaveContext(message.Chat.ID, &context)
+		context := userContext{Query: query, Position: 0, Count: len(courses)}
+		saveContext(message.Chat.ID, &context)
 
 		courseInfo := courses[context.Position]
 
@@ -90,7 +90,7 @@ func handleCommand(message *tgbotapi.Message) {
 	var answer string
 	switch command := message.Command(); command {
 	case "start":
-		answer = fmt.Sprintf(Greeting, message.From.UserName)
+		answer = fmt.Sprintf(greeting, message.From.UserName)
 	default:
 		answer = fmt.Sprintf("Unknown command: %s", command)
 	}
@@ -129,17 +129,19 @@ func handleCallbackQuery(callbackQuery *tgbotapi.CallbackQuery) {
 	bot.AnswerCallbackQuery(tgbotapi.CallbackConfig{CallbackQueryID: callbackQuery.ID})
 
 	// Check if there context for that user.
-	context := RestoreContext(callbackQuery.Message.Chat.ID)
+	context := restoreContext(callbackQuery.Message.Chat.ID)
 	if context == nil {
-		bot.Send(tgbotapi.NewMessage(callbackQuery.Message.Chat.ID, NoContextFound))
+		bot.Send(tgbotapi.NewMessage(callbackQuery.Message.Chat.ID, noContextFound))
 		return
 	}
 
+	// Calculate delta.
 	delta, _ := strconv.Atoi(callbackQuery.Data)
 	context.Position = shared.Max(context.Position+delta, 0)
 	context.Position = shared.Min(context.Position, context.Count-1)
-	SaveContext(callbackQuery.Message.Chat.ID, context)
+	saveContext(callbackQuery.Message.Chat.ID, context)
 
+	// Get last results.
 	courses := getCourses(context.Query)
 	if len(courses) == 0 {
 		logu.Warning.Println("getCourses returned no courses")
@@ -147,6 +149,7 @@ func handleCallbackQuery(callbackQuery *tgbotapi.CallbackQuery) {
 	}
 	courseInfo := courses[shared.Min(len(courses)-1, context.Position)]
 
+	// Answer in TG.
 	msg := tgbotapi.NewEditMessageText(callbackQuery.Message.Chat.ID,
 		callbackQuery.Message.MessageID, courseInfo.String())
 	keyboard := createKeyboard(context)
@@ -162,10 +165,10 @@ func getCourses(query string) []shared.CourseInfo {
 		return nil
 	}
 
-	jsonStr := Search(query, PerSrcLimit)
+	jsonStr := RudraSearch(query, perSrcLimit)
 	//logu.Trace.Println(jsonStr)
-	courses := make([]shared.CourseInfo, 0, PerSrcLimit)
 
+	var courses []shared.CourseInfo
 	if err := json.Unmarshal([]byte(jsonStr), &courses); err != nil {
 		logu.Error.Println("Bad JSON:", err)
 		return nil
@@ -186,7 +189,7 @@ func courseInfoToInlineQueryResult(c shared.CourseInfo) tgbotapi.InlineQueryResu
 	return article
 }
 
-func createKeyboard(context *UserContext) tgbotapi.InlineKeyboardMarkup {
+func createKeyboard(context *userContext) tgbotapi.InlineKeyboardMarkup {
 	status := fmt.Sprintf("%d of %d", context.Position+1, context.Count)
 	btbl := tgbotapi.NewInlineKeyboardButtonData(status, "0")
 

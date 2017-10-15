@@ -2,6 +2,7 @@ package shared
 
 import "fmt"
 
+// CourseInfo stores info about course.
 type CourseInfo struct {
 	Name     string `json:"name"`
 	Headline string `json:"headline"`

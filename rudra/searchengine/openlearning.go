@@ -7,8 +7,7 @@ import (
 )
 
 const (
-	OpenLearningApiUrl         = "https://www.openlearning.com/api/courses/list?type=free,paid"
-	OpenLearningCollectionName = "openlearning"
+	openLearningAPIURL = "https://www.openlearning.com/api/courses/list?type=free,paid"
 )
 
 type openlearningResponse struct {
@@ -30,11 +29,7 @@ func (me *openlearningAdapter) Name() string {
 }
 
 func (me *openlearningAdapter) Get(query string, limit int) []shared.CourseInfo {
-	return OpenLearningAdapter(query, limit)
-}
-
-func OpenLearningAdapter(query string, limit int) []shared.CourseInfo {
-	data, err0 := netu.MakeRequest(OpenLearningApiUrl, nil, nil)
+	data, err0 := netu.MakeRequest(openLearningAPIURL, nil, nil)
 	if err0 != nil {
 		logu.Error.Println("err0", err0)
 		return nil

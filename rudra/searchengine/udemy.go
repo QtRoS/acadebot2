@@ -9,9 +9,9 @@ import (
 )
 
 const (
-	UdemyApiUrl  = "https://www.udemy.com/api-2.0/courses"
-	AuthHeader   = "Basic MlloUmZ1TXpUSjJLMjJmZWZoSldTeVoyanVtOWx0dkdoWFhFUWZQaTpiNGRIUXhmUDdsODVWa3RHQlM4dUFpdU5ZclpyOEZWY3E3cFpTaWRXbVNMSTBuNm5mWGFyRUxSQ2xqdEtDbjZPcTR3ZkZwWjlqM0RsdU13aUhDN0UxVW1zS1YyQzRtSUlvR2ZEYXpNYVhtbDZjRGtHcjJmOHVqVzVkQ2J5VThaaw=="
-	UdemyBaseUrl = "https://www.udemy.com"
+	udemyAPIURL  = "https://www.udemy.com/api-2.0/courses"
+	authHeader   = "Basic MlloUmZ1TXpUSjJLMjJmZWZoSldTeVoyanVtOWx0dkdoWFhFUWZQaTpiNGRIUXhmUDdsODVWa3RHQlM4dUFpdU5ZclpyOEZWY3E3cFpTaWRXbVNMSTBuNm5mWGFyRUxSQ2xqdEtDbjZPcTR3ZkZwWjlqM0RsdU13aUhDN0UxVW1zS1YyQzRtSUlvR2ZEYXpNYVhtbDZjRGtHcjJmOHVqVzVkQ2J5VThaaw=="
+	udemyBaseUrl = "https://www.udemy.com"
 )
 
 type udemyResponse struct {
@@ -19,8 +19,8 @@ type udemyResponse struct {
 }
 
 type udemyResult struct {
-	Id       int    `json:"id"`
-	Url      string `json:"url"`
+	ID       int    `json:"id"`
+	URL      string `json:"url"`
 	Title    string `json:"title"`
 	Headline string `json:"headline"`
 	Image    string `json:"image_480x270"`
@@ -34,14 +34,9 @@ func (me *udemyAdapter) Name() string {
 }
 
 func (me *udemyAdapter) Get(query string, limit int) []shared.CourseInfo {
-	return UdemyAdapter(query, limit)
-}
-
-func UdemyAdapter(query string, limit int) []shared.CourseInfo {
-
-	data, err0 := netu.MakeRequest(UdemyApiUrl,
+	data, err0 := netu.MakeRequest(udemyAPIURL,
 		map[string]string{"search": query, "page_size": strconv.Itoa(limit), "ordering": "trending", "fields[course]": "@default,headline"},
-		map[string]string{"Authorization": AuthHeader})
+		map[string]string{"Authorization": authHeader})
 
 	if err0 != nil {
 		logu.Error.Println("err0", err0)
@@ -59,7 +54,7 @@ func UdemyAdapter(query string, limit int) []shared.CourseInfo {
 
 	var infos = make([]shared.CourseInfo, 0, limit)
 	for _, e := range response.Results {
-		link := UdemyBaseUrl + e.Url
+		link := udemyBaseUrl + e.URL
 		info := shared.CourseInfo{Name: e.Title, Headline: e.Headline, Link: link, Art: e.Image}
 		infos = append(infos, info)
 	}

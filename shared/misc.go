@@ -1,5 +1,6 @@
 package shared
 
+// Min of two values.
 func Min(a, b int) int {
 	if a < b {
 		return a
@@ -7,6 +8,7 @@ func Min(a, b int) int {
 	return b
 }
 
+// Max of two values.
 func Max(a, b int) int {
 	if a > b {
 		return a

@@ -20,12 +20,13 @@ type SourceAdapter interface {
 
 var adapters = []SourceAdapter{
 	&courseraAdapter{},
-	NewFilteringAdapter(NewCachingAdapter(&udacityAdapter{}, time.Hour*6)),
+	newFilteringAdapter(newCachingAdapter(&udacityAdapter{}, time.Hour*6)),
 	&udemyAdapter{},
-	NewFilteringAdapter(NewCachingAdapter(&openlearningAdapter{}, time.Hour*6)),
-	NewFilteringAdapter(NewCachingAdapter(&iversityAdapter{}, time.Hour*6)),
+	newFilteringAdapter(newCachingAdapter(&openlearningAdapter{}, time.Hour*6)),
+	newFilteringAdapter(newCachingAdapter(&iversityAdapter{}, time.Hour*6)),
 }
 
+// Search for courses in all services.
 func Search(query string, perSourceLimit int) string {
 	if query == "" || perSourceLimit <= 0 {
 		return emptyResult

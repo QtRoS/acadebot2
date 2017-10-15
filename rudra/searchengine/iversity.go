@@ -7,8 +7,7 @@ import (
 )
 
 const (
-	IversityApiUrl         = "https://iversity.org/api/v1/courses"
-	IversityCollectionName = "iversity"
+	iversityAPIURL = "https://iversity.org/api/v1/courses"
 )
 
 type iversityResponse struct {
@@ -16,7 +15,7 @@ type iversityResponse struct {
 }
 
 type iversityResult struct {
-	Url      string `json:"url"`
+	URL      string `json:"url"`
 	Title    string `json:"title"`
 	Subtitle string `json:"subtitle"`
 	Image    string `json:"image"`
@@ -30,11 +29,7 @@ func (me *iversityAdapter) Name() string {
 }
 
 func (me *iversityAdapter) Get(query string, limit int) []shared.CourseInfo {
-	return IversityAdapter(query, limit)
-}
-
-func IversityAdapter(query string, limit int) []shared.CourseInfo {
-	data, err0 := netu.MakeRequest(IversityApiUrl, nil, nil)
+	data, err0 := netu.MakeRequest(iversityAPIURL, nil, nil)
 	if err0 != nil {
 		logu.Error.Println("err0", err0)
 		return nil
@@ -51,7 +46,7 @@ func IversityAdapter(query string, limit int) []shared.CourseInfo {
 
 	var infos = make([]shared.CourseInfo, len(response.Courses))
 	for i, e := range response.Courses {
-		info := shared.CourseInfo{Name: e.Title, Headline: e.Subtitle, Link: e.Url, Art: e.Image}
+		info := shared.CourseInfo{Name: e.Title, Headline: e.Subtitle, Link: e.URL, Art: e.Image}
 		infos[i] = info
 	}
 

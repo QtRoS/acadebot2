@@ -9,8 +9,8 @@ import (
 )
 
 const (
-	CourseraApiUrl  = "https://api.coursera.org/api/courses.v1"
-	CourseraBaseUrl = "http://www.coursera.org/learn/"
+	courseraApiUrl  = "https://api.coursera.org/api/courses.v1"
+	courseraBaseUrl = "http://www.coursera.org/learn/"
 )
 
 type courseraResponse struct {
@@ -18,7 +18,7 @@ type courseraResponse struct {
 }
 
 type courseraElement struct {
-	Id          string `json:"id"`
+	ID          string `json:"id"`
 	Slug        string `json:"slug"`
 	Name        string `json:"name"`
 	Description string `json:"description"`
@@ -34,12 +34,7 @@ func (me *courseraAdapter) Name() string {
 }
 
 func (me *courseraAdapter) Get(query string, limit int) []shared.CourseInfo {
-	return CourseraAdapter(query, limit)
-}
-
-func CourseraAdapter(query string, limit int) []shared.CourseInfo {
-
-	data, err0 := netu.MakeRequest(CourseraApiUrl,
+	data, err0 := netu.MakeRequest(courseraApiUrl,
 		map[string]string{"q": "search", "fields": "description,photoUrl", "query": query, "limit": strconv.Itoa(limit)}, nil)
 
 	if err0 != nil {
@@ -58,7 +53,7 @@ func CourseraAdapter(query string, limit int) []shared.CourseInfo {
 
 	var infos = make([]shared.CourseInfo, 0, limit)
 	for _, e := range response.Elements {
-		link := CourseraBaseUrl + e.Slug
+		link := courseraBaseUrl + e.Slug
 		desc := e.Description[:shared.Min(240, len(e.Description))]
 		info := shared.CourseInfo{Name: e.Name, Headline: desc, Link: link, Art: e.PhotoUrl}
 		infos = append(infos, info)
