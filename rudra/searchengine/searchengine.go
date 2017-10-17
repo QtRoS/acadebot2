@@ -20,10 +20,10 @@ type SourceAdapter interface {
 
 var adapters = []SourceAdapter{
 	&courseraAdapter{},
-	newFilteringAdapter(newCachingAdapter(&udacityAdapter{}, time.Hour*6)),
+	newFuzzyFilteringAdapter(newCachingAdapter(&udacityAdapter{}, time.Hour*6)),
 	&udemyAdapter{},
-	newFilteringAdapter(newCachingAdapter(&openlearningAdapter{}, time.Hour*6)),
-	newFilteringAdapter(newCachingAdapter(&iversityAdapter{}, time.Hour*6)),
+	newFuzzyFilteringAdapter(newCachingAdapter(&openlearningAdapter{}, time.Hour*6)),
+	newFuzzyFilteringAdapter(newCachingAdapter(&iversityAdapter{}, time.Hour*6)),
 }
 
 // Search for courses in all services.
