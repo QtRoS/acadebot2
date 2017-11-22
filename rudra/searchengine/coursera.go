@@ -2,6 +2,7 @@ package searchengine
 
 import (
 	"strconv"
+	"strings"
 
 	"github.com/QtRoS/acadebot2/shared"
 	"github.com/QtRoS/acadebot2/shared/logu"
@@ -54,7 +55,7 @@ func (me *courseraAdapter) Get(query string, limit int) []shared.CourseInfo {
 	var infos = make([]shared.CourseInfo, 0, limit)
 	for _, e := range response.Elements {
 		link := courseraBaseUrl + e.Slug
-		desc := e.Description[:shared.Min(240, len(e.Description))]
+		desc := strings.Split(e.Description, "\n")[0] //e.Description[:shared.Min(240, len(e.Description))]
 		info := shared.CourseInfo{Name: e.Name, Headline: desc, Link: link, Art: e.PhotoUrl}
 		infos = append(infos, info)
 	}

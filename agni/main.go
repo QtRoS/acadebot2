@@ -83,6 +83,7 @@ func handleMessage(message *tgbotapi.Message) {
 		msg := tgbotapi.NewMessage(message.Chat.ID, courseInfo.String())
 		msg.ReplyToMessageID = message.MessageID
 		msg.ReplyMarkup = createKeyboard(&context)
+		msg.ParseMode = "Markdown"
 		bot.Send(msg)
 	}
 }
@@ -156,6 +157,7 @@ func handleCallbackQuery(callbackQuery *tgbotapi.CallbackQuery) {
 		callbackQuery.Message.MessageID, courseInfo.String())
 	keyboard := createKeyboard(context)
 	msg.BaseEdit.ReplyMarkup = &keyboard
+	msg.ParseMode = "Markdown"
 	bot.Send(msg)
 }
 

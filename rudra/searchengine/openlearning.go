@@ -1,6 +1,8 @@
 package searchengine
 
 import (
+	"strings"
+
 	"github.com/QtRoS/acadebot2/shared"
 	"github.com/QtRoS/acadebot2/shared/logu"
 	"github.com/QtRoS/acadebot2/shared/netu"
@@ -46,7 +48,7 @@ func (me *openlearningAdapter) Get(query string, limit int) []shared.CourseInfo 
 
 	var infos = make([]shared.CourseInfo, len(response.Courses))
 	for i, e := range response.Courses {
-		headline := e.Summary[:shared.Min(240, len(e.Summary))]
+		headline := strings.Split(e.Summary, "\n")[0] //e.Summary[:shared.Min(240, len(e.Summary))]
 		info := shared.CourseInfo{Name: e.Name, Headline: headline, Link: e.CourseUrl, Art: e.Image}
 		infos[i] = info
 	}
