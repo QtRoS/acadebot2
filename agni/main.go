@@ -15,7 +15,7 @@ import (
 
 const (
 	envAPIKey        = "ENV_API_KEY"
-	perSrcLimit      = 12
+	perSrcLimit      = 10
 	noCoursesFound   = "Sorry, no similar course found."
 	dummyPlaceholder = "Just a moment..."
 	noContextFound   = "Sorry, can't navigate through results. Try to search again!"
