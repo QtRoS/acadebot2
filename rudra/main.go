@@ -6,10 +6,11 @@ import (
 	"strconv"
 
 	"github.com/QtRoS/acadebot2/rudra/searchengine"
+	"github.com/QtRoS/acadebot2/shared/logu"
 )
 
 const (
-	Port         = ":19191"
+	port         = ":19191"
 	defaultLimit = 10
 )
 
@@ -25,5 +26,7 @@ func serveCourses(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	http.HandleFunc("/courses", serveCourses)
-	http.ListenAndServe(Port, nil)
+	if err := http.ListenAndServe(port, nil); err != nil {
+		logu.Error.Fatal(err)
+	}
 }

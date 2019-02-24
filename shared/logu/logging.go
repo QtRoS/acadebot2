@@ -2,11 +2,11 @@ package logu // logutils
 
 import (
 	"io"
-	_ "io/ioutil"
 	"log"
 	"os"
 )
 
+// Handy loggers.
 var (
 	Trace   *log.Logger
 	Info    *log.Logger

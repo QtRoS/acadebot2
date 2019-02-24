@@ -18,6 +18,7 @@ type SourceAdapter interface {
 	Name() string
 }
 
+// TODO Remove from init section.
 var adapters = []SourceAdapter{
 	&courseraAdapter{},
 	newFuzzyFilteringAdapter(newCachingAdapter(&udacityAdapter{}, time.Hour*6)),
