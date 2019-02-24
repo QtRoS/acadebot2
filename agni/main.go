@@ -1,20 +1,29 @@
 package main
 
 import (
+	"context"
 	"crypto/md5"
 	"encoding/json"
 	"fmt"
+	"net"
+	"net/http"
 	"os"
 	"strconv"
 	"strings"
 
 	"github.com/QtRoS/acadebot2/shared"
 	"github.com/QtRoS/acadebot2/shared/logu"
+	// _ "golang.org/x/net/internal/socks"
+	"golang.org/x/net/proxy"
 	"gopkg.in/telegram-bot-api.v4"
 )
 
 const (
 	envAPIKey        = "ENV_API_KEY"
+	envProxyAddr     = "ENV_PROXY_ADDR"
+	envProxyPort     = "ENV_PROXY_PORT"
+	envProxyLogin    = "ENV_PROXY_LOGIN"
+	envProxyPass     = "ENV_PROXY_PASS"
 	perSrcLimit      = 10
 	noCoursesFound   = "Sorry, no similar course found."
 	dummyPlaceholder = "Just a moment..."
@@ -31,14 +40,51 @@ var bot *tgbotapi.BotAPI
 
 func init() {
 	token := os.Getenv(envAPIKey)
-
 	logu.Trace.Print("Token: ", token)
 
+	proxyAddr := os.Getenv(envProxyAddr)
+	proxyPort := os.Getenv(envProxyPort)
+	proxyLogin := os.Getenv(envProxyLogin)
+	proxyPass := os.Getenv(envProxyPass)
+
+	// tg://socks?server=d2a5e5.reconnect.rocks&port=1080&user=3559738&pass=11a1fcc2
+	// sr.spry.fail
+	// sr123.spry.fail&port=1080&user=telegram&pass=telegram
+	// tg://socks?server=tkhpg.teletype.live&port=1080&user=telegram&pass=telegram
+	// proxyAddr := "tkhpg.teletype.live"
+	// proxyPort := "1080"
+	// proxyLogin := "telegram"
+	// proxyPass := "telegram"
+
+	logu.Trace.Printf("Proxy information: addr='%s' port='%s' login='%s' pass='%s'", proxyAddr, proxyPort, proxyLogin, proxyPass)
+
+	// ----------------------------------------------------------------- <<<
+
+	proxyAuth := &proxy.Auth{User: proxyLogin, Password: proxyPass}
+	tr := http.Transport{
+		DialContext: func(_ context.Context, network, addr string) (net.Conn, error) {
+			socksDialer, err := proxy.SOCKS5("tcp", fmt.Sprintf("%s:%s", proxyAddr, proxyPort), proxyAuth, proxy.Direct)
+			// socksDialer, err := proxy.SOCKS5("tcp", "sr123.spry.fail:1080", &proxy.Auth{User: "telegram", Password: "telegram"}, proxy.Direct)
+			if err != nil {
+				return nil, err
+			}
+			return socksDialer.Dial(network, addr)
+		},
+	}
+
+	// Bot init
 	var err error
-	bot, err = tgbotapi.NewBotAPI(token)
+	bot, err = tgbotapi.NewBotAPIWithClient(token, &http.Client{Transport: &tr})
 	if err != nil {
 		logu.Error.Panic(err)
 	}
+
+	// ----------------------------------------------------------------- >>>
+
+	// bot, err = tgbotapi.NewBotAPI(token)
+	// if err != nil {
+	// 	logu.Error.Panic(err)
+	// }
 	bot.Debug = false
 	logu.Info.Printf("Authorized on account %s", bot.Self.UserName)
 }
